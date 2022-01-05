@@ -1,3 +1,9 @@
+#  private key - environment var as alphavantage
+#  win: SET alphavantage=key
+#  linux: export alphavantage=key
+#  generate on https://www.alphavantage.co/
+
+
 import requests
 import os
 import json
