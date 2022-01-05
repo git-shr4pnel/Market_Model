@@ -2,6 +2,9 @@ import requests
 import os
 import json
 import time
+import datetime as dt
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 global symbols
 
 
@@ -81,9 +84,26 @@ def organize_data(data):
     return filing_cabinet
 
 
+def plot(data):
+    for item in data.keys():
+        x_points, y_points = [], []
+        for point in data[item]:
+            x_points.append(point.date)
+            y_points.append(point.close)
+    print(data["NVDA"])
+    datetime_dates = [dt.datetime.strptime(str(d), "%Y-%m-%d").date() for d in x_points]
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+    plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=12))
+    plt.xlabel("Dates")
+    plt.ylabel("Closing Price (£)")
+    plt.plot(datetime_dates, y_points, color="red")
+    plt.show()
+
+
 def main():
     stocks = get_finance_data()
     sorted_data = organize_data(stocks)
+    plot(sorted_data)
 
 
 if __name__ == "__main__":
