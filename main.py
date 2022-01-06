@@ -8,6 +8,7 @@ import requests
 import os
 import json
 import time
+import sys
 import tkinter as tk
 from tkinter import ttk
 import datetime as dt
@@ -92,6 +93,10 @@ def organize_data(data):
     return filing_cabinet
 
 
+def seperate_plot(data):
+    print(data)
+
+
 def spec_prompt(data):
     # window init
     window = tk.Tk()
@@ -101,14 +106,6 @@ def spec_prompt(data):
     window.resizable(False, False)
     window.attributes("-topmost", 1)
     # checkbutton init
-    for i in range(10):
-        window.columnconfigure(i)
-        for j in range(10):
-            ttk.Frame(window).grid(row=j, column=i)  # filling up columns
-    for i in range(10):
-        window.rowconfigure(i)
-        for j in range(10):
-            ttk.Frame(window).grid(row=i, column=j)  # filling up rows
     checkboxes, values = [], []
     for val in range(5):
         var = tk.BooleanVar()
@@ -123,31 +120,54 @@ def spec_prompt(data):
     label = ttk.Label(text="Select the stocks you wish to visualize:")
     label.grid(row=0, column=0, pady=5, padx=10)
     # button init
-    tk_quit = ttk.Button(text="Quit", command=lambda: window.destroy())
+    tk_quit = ttk.Button(text="Quit", command=lambda: (window.destroy(), sys.exit(0)))
     tk_confirm = ttk.Button(text="Apply", command=lambda: window.destroy())
     tk_quit.place(x=260, y=110)
     tk_confirm.place(x=175, y=110)
-
+    # radiobutton init
+    var = tk.IntVar()
+    var.set(0)
+    tk_seperate = ttk.Radiobutton(window, text="Seperate", variable=var, value=0)
+    tk_intersection = ttk.Radiobutton(window, text="Intersection", variable=var, value=1)
+    tk_seperate.place(x=175, y=80)
+    tk_intersection.place(x=255, y=80)
     window.mainloop()
+    # verifying tickboxes
+    verif = {"state": var.get()}
+    for n, item in enumerate(values):
+        state = item.get()
+        symb = tuple(data.keys())[n]
+        verif[symb] = state
+    if True not in verif.values():
+        print("You need to select at least one stock to plot on the graph.")
+        sys.exit(1)
+    new_data = {}
+    for n, v in enumerate(tuple(verif.values())[1:]):
+        if v:
+            new_data[tuple(verif.keys())[n]] = data[tuple(data.keys())[n]]
+    if not verif["state"]:
+        seperate_plot(new_data)
+        sys.exit(1)
+    if len(new_data.values()) == 5:
+        multi_plot(new_data)
 
 
 def prompt(data):
-    window = tk.Tk()    # I'm learning tkinter. this is reference for me
+    # window init
+    window = tk.Tk()
     window.title("Stocks")
     window.geometry("300x100+100+100")
     window.resizable(False, False)
     window.attributes("-topmost", 1)  # this means that the window stays on top until closed
-    for i in range(7):
-        window.columnconfigure(i, weight=1)
-        window.rowconfigure(i, weight=1)
-    m_button = ttk.Button(text="All", command=lambda: (window.destroy(), multi_plot(data)))
-    s_button = ttk.Button(text="Individual", command=lambda: (window.destroy(), spec_prompt(data)))
-    kill_button = ttk.Button(text="Quit", command=lambda: (window.destroy()))
-    m_button.grid(row=5, column=2)
-    s_button.grid(row=5, column=3)
-    kill_button.grid(row=5, column=4)
+    # button init
+    tk_all = ttk.Button(text="All", command=lambda: (window.destroy(), multi_plot(data)))
+    tk_individual = ttk.Button(text="Individual", command=lambda: (window.destroy(), spec_prompt(data)))
+    tk_quit = ttk.Button(text="Quit", command=lambda: (window.destroy(), sys.exit(0)))
+    tk_all.place(x=37, y=70)
+    tk_individual.place(x=112.5, y=70)
+    tk_quit.place(x=188.5, y=70)
     label = ttk.Label(text="Select a visualisation!")
-    label.grid(row=2, column=3)
+    label.place(x=95, y=10)
     window.mainloop()
 
 
