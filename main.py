@@ -92,6 +92,45 @@ def organize_data(data):
     return filing_cabinet
 
 
+def spec_prompt(data):
+    # window init
+    window = tk.Tk()
+    window.title("Choose stocks:")
+    window.focus_force()
+    window.geometry("350x150+100+100")
+    window.resizable(False, False)
+    window.attributes("-topmost", 1)
+    # checkbutton init
+    for i in range(10):
+        window.columnconfigure(i)
+        for j in range(10):
+            ttk.Frame(window).grid(row=j, column=i)  # filling up columns
+    for i in range(10):
+        window.rowconfigure(i)
+        for j in range(10):
+            ttk.Frame(window).grid(row=i, column=j)  # filling up rows
+    checkboxes, values = [], []
+    for val in range(5):
+        var = tk.BooleanVar()
+        var.set(False)
+        values.append(var)  # setting state of checkboxes (off, it has to be done like this)
+    for check in range(5):
+        box = ttk.Checkbutton(window, text=tuple(data.keys())[check], variable=values[check])
+        checkboxes.append(box)
+    for n, item in enumerate(checkboxes):
+        item.grid(column=0, row=n+1, sticky="sw", padx=30)
+    # label init
+    label = ttk.Label(text="Select the stocks you wish to visualize:")
+    label.grid(row=0, column=0, pady=5, padx=10)
+    # button init
+    tk_quit = ttk.Button(text="Quit", command=lambda: window.destroy())
+    tk_confirm = ttk.Button(text="Apply", command=lambda: window.destroy())
+    tk_quit.place(x=260, y=110)
+    tk_confirm.place(x=175, y=110)
+
+    window.mainloop()
+
+
 def prompt(data):
     window = tk.Tk()    # I'm learning tkinter. this is reference for me
     window.title("Stocks")
@@ -101,8 +140,8 @@ def prompt(data):
     for i in range(7):
         window.columnconfigure(i, weight=1)
         window.rowconfigure(i, weight=1)
-    m_button = ttk.Button(text="Multi", command=lambda: (window.destroy(), multi_plot(data)))
-    s_button = ttk.Button(text="Seperate", command=lambda: (window.destroy(), multi_plot(data)))
+    m_button = ttk.Button(text="All", command=lambda: (window.destroy(), multi_plot(data)))
+    s_button = ttk.Button(text="Individual", command=lambda: (window.destroy(), spec_prompt(data)))
     kill_button = ttk.Button(text="Quit", command=lambda: (window.destroy()))
     m_button.grid(row=5, column=2)
     s_button.grid(row=5, column=3)
