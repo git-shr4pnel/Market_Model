@@ -1,6 +1,6 @@
 #  private key - environment var as alphavantage
 #  win: SET alphavantage=key
-#  linux: export alphavantage=key
+#  unix: export alphavantage=key
 #  generate on https://www.alphavantage.co/
 
 
@@ -8,6 +8,8 @@ import requests
 import os
 import json
 import time
+import tkinter as tk
+from tkinter import ttk
 import datetime as dt
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -90,26 +92,49 @@ def organize_data(data):
     return filing_cabinet
 
 
-def plot(data):
-    for item in data.keys():
+def prompt(data):
+    window = tk.Tk()    # I'm learning tkinter. this is reference for me
+    window.title("Stocks")
+    window.geometry("300x100+100+100")
+    window.resizable(False, False)
+    window.attributes("-topmost", 1)  # this means that the window stays on top until closed
+    for i in range(7):
+        window.columnconfigure(i, weight=1)
+        window.rowconfigure(i, weight=1)
+    m_button = ttk.Button(text="Multi", command=lambda: (window.destroy(), multi_plot(data)))
+    s_button = ttk.Button(text="Seperate", command=lambda: (window.destroy(), multi_plot(data)))
+    kill_button = ttk.Button(text="Quit", command=lambda: (window.destroy()))
+    m_button.grid(row=5, column=2)
+    s_button.grid(row=5, column=3)
+    kill_button.grid(row=5, column=4)
+    label = ttk.Label(text="Select a visualisation!")
+    label.grid(row=2, column=3)
+    window.mainloop()
+
+
+def multi_plot(data):
+    colors = ("black", "blue", "red", "purple", "green")
+    plt.figure(figsize=(15, 7.5))  # the amount of googling it took for this line was distressing
+    for n, item in enumerate(data.keys()):
         x_points, y_points = [], []
         for point in data[item]:
             x_points.append(point.date)
             y_points.append(point.close)
-    print(data["NVDA"])
-    datetime_dates = [dt.datetime.strptime(str(d), "%Y-%m-%d").date() for d in x_points]
+        x_points = [dt.datetime.strptime(str(d), "%Y-%m-%d").date() for d in x_points]
+        plt.plot(x_points, y_points, color=colors[n], label=item)
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
     plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=12))
     plt.xlabel("Dates")
     plt.ylabel("Closing Price (£)")
-    plt.plot(datetime_dates, y_points, color="red")
+    plt.xticks(rotation=22.5)
+    plt.legend()
     plt.show()
 
 
 def main():
     stocks = get_finance_data()
     sorted_data = organize_data(stocks)
-    plot(sorted_data)
+    prompt(sorted_data)
 
 
 if __name__ == "__main__":
