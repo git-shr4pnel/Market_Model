@@ -94,7 +94,22 @@ def organize_data(data):
 
 
 def seperate_plot(data):
-    print(data)
+    if len(data.keys()) == 2:
+        fig, (axs1, axs2) = plt.subplots(1, 2, figsize=(15, 7.5))
+        axs1.set_xlabel("Date")
+        axs1.set_ylabel("Closing Price (£)")
+        axs2.set_xlabel("Date")
+        axs2.set_ylabel("Closing Price (£)")
+        fig.suptitle("Stocks")
+        for n, item in enumerate(data.keys()):
+            x_points, y_points = [], []
+            for point in data[item]:
+                x_points.append(point.date)
+                y_points.append(point.close)
+            x_points = [dt.datetime.strptime(str(d), "%Y-%m-%d").date() for d in x_points]
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+        plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=12))
+        plt.show()
 
 
 def spec_prompt(data):
@@ -144,7 +159,7 @@ def spec_prompt(data):
     new_data = {}
     for n, v in enumerate(tuple(verif.values())[1:]):
         if v:
-            new_data[tuple(verif.keys())[n]] = data[tuple(data.keys())[n]]
+            new_data[tuple(verif.keys())[n+1]] = data[tuple(data.keys())[n]]
     if not verif["state"]:
         seperate_plot(new_data)
         sys.exit(1)
