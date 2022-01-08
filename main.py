@@ -208,7 +208,8 @@ def multi_plot(data):
 def main():
     stocks = get_finance_data()
     sorted_data = organize_data(stocks)
-    prompt(sorted_data)
+    while 1:
+        prompt(sorted_data)
 
 
 if __name__ == "__main__":
