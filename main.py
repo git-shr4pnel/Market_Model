@@ -94,22 +94,22 @@ def organize_data(data):
 
 
 def seperate_plot(data):
-    if len(data.keys()) == 2:
-        fig, (axs1, axs2) = plt.subplots(1, 2, figsize=(15, 7.5))
-        axs1.set_xlabel("Date")
-        axs1.set_ylabel("Closing Price (£)")
-        axs2.set_xlabel("Date")
-        axs2.set_ylabel("Closing Price (£)")
-        fig.suptitle("Stocks")
-        for n, item in enumerate(data.keys()):
-            x_points, y_points = [], []
-            for point in data[item]:
-                x_points.append(point.date)
-                y_points.append(point.close)
-            x_points = [dt.datetime.strptime(str(d), "%Y-%m-%d").date() for d in x_points]
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+    colors = ("blue", "red", "purple", "green", "black")
+    for n, item in enumerate(data.keys()):
+        x_points, y_points = [], []
+        for point in data[item]:
+            x_points.append(point.date)
+            y_points.append(point.close)
+        x_points = [dt.datetime.strptime(str(d), "%Y-%m-%d").date() for d in x_points]  # creates dt object
+        plt.figure(figsize=(10, 7.5))
+        plt.plot(x_points, y_points, color=colors[n], label=item)
+        plt.xlabel("Dates")
+        plt.ylabel("Closing Price (£)")
+        plt.xticks(rotation=30)
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))  # sets format of dates
         plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=12))
-        plt.show()
+        plt.title(item)
+    plt.show()
 
 
 def spec_prompt(data):
