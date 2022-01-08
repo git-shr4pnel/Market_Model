@@ -112,6 +112,10 @@ def seperate_plot(data):
     plt.show()
 
 
+def multi_indiv_plot(data):
+    colors = ("blue", "red", "purple", "green", "black")
+
+
 def spec_prompt(data):
     # window init
     window = tk.Tk()
@@ -162,7 +166,7 @@ def spec_prompt(data):
             new_data[tuple(verif.keys())[n+1]] = data[tuple(data.keys())[n]]
     if not verif["state"]:
         seperate_plot(new_data)
-        sys.exit(1)
+        return
     if len(new_data.values()) == 5:
         multi_plot(new_data)
 
@@ -172,6 +176,7 @@ def prompt(data):
     window = tk.Tk()
     window.title("Stocks")
     window.geometry("300x100+100+100")
+    window.focus_force()
     window.resizable(False, False)
     window.attributes("-topmost", 1)  # this means that the window stays on top until closed
     # button init
