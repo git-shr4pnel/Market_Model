@@ -9,6 +9,7 @@ import os
 import json
 import time
 import sys
+import webbrowser
 import tkinter as tk
 from tkinter import ttk
 import datetime as dt
@@ -112,10 +113,6 @@ def seperate_plot(data):
     plt.show()
 
 
-def multi_indiv_plot(data):
-    colors = ("blue", "red", "purple", "green", "black")
-
-
 def spec_prompt(data):
     # window init
     window = tk.Tk()
@@ -159,16 +156,15 @@ def spec_prompt(data):
         verif[symb] = state
     if True not in verif.values():
         print("You need to select at least one stock to plot on the graph.")
-        sys.exit(1)
+        return
     new_data = {}
     for n, v in enumerate(tuple(verif.values())[1:]):
         if v:
             new_data[tuple(verif.keys())[n+1]] = data[tuple(data.keys())[n]]
-    if not verif["state"]:
+    if not verif["state"]:  # if radiobutton selected is "seperate":
         seperate_plot(new_data)
         return
-    if len(new_data.values()) == 5:
-        multi_plot(new_data)
+    multi_plot(new_data)
 
 
 def prompt(data):
@@ -192,7 +188,7 @@ def prompt(data):
 
 
 def multi_plot(data):
-    colors = ("black", "blue", "red", "purple", "green")
+    colors = ("blue", "red", "purple", "green", "black")
     plt.figure(figsize=(15, 7.5))  # the amount of googling it took for this line was distressing
     for n, item in enumerate(data.keys()):
         x_points, y_points = [], []
@@ -210,7 +206,18 @@ def multi_plot(data):
     plt.show()
 
 
+def startup():
+    try:
+        os.environ["alphavantagea"]
+    except KeyError:
+        window = tk.Tk()
+        window.geometry("300x150+100+100")
+        window.focus_force()
+        window.mainloop()
+
+
 def main():
+    startup()
     stocks = get_finance_data()
     sorted_data = organize_data(stocks)
     while 1:
